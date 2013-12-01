@@ -1,6 +1,7 @@
 # a Vim-like remote for Tivo, Plex Home Theatre, and Yamaha Receivers
-## Not very user friendly unless you have the exact same setup as me.
-  - Change ips and ports in each module 
+## Not very user friendly unless you have the exact same setup as me:
+### Yamaha RX-V473, Tivo Premeire, Plex Home Theatre
+  - Change ips and ports in each module to match your network and equipment
 
 ## Things to do:
   - config file
