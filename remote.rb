@@ -64,8 +64,16 @@ until @status == 'q'
 		p @mode
 	when 'q'
 		@status = 'q'
+	when 'H'
+		puts "#{@mode} commands"
+		puts "Key : Command"
+		Object.const_get(@mode)::HASH.each { |key,value| puts " #{key}  : #{value}" }
 	else
-	Object.const_get(@mode).send(str)
+		if Object.const_get(@mode).respond_to?(str)
+			Object.const_get(@mode).send(str)
+		else
+			puts "Not a valid command, press 'H' for help"
+		end
 	end
 end
 end
