@@ -7,15 +7,13 @@ require 'open-uri'
 # Plex Home Theatre, I think this uses a new port now. Plex-Ruby gem wouldn't work for me
 module Plex
   HASH = { 'k' => 'moveUp', 'j' => 'moveDown', 'h' => 'moveLeft', 'l' => 'moveRight', 'K' => 'pageUp', 'J' => 'pageDown', ' ' => 'select', 'b' => 'back', 't' => 'toggleOSD' }
-  HASH.each_key do |method|
-    define_method method do
-      begin
-        open("http://10.0.1.23:32400/system/players/10.0.1.23/navigation/#{HASH[method]}")
-      rescue
-        puts "can't connect to Plex" #would like something more helpful
-      end
+  def keypress key
+    begin
+      open("http://10.0.1.23:32400/system/players/10.0.1.23/navigation/#{HASH[key]}")
+    rescue
+      puts "can't connect to Plex" #would like something more helpful
     end
-  end
+	end
   extend self
 end
 # Tivo Series 3
@@ -26,16 +24,14 @@ module Tivo
 
   HASH = { 'j' => 'CHANNELDOWN', 'k' => 'CHANNELUP', 'J' => 'DOWN', 'K' => 'UP','l' => 'RIGHT', 'h' => 'LEFT', 'g' => 'GUIDE', ' ' => 'SELECT', 'T' => 'THUMBSUP', 't' => 'THUMBSDOWN', 'r' => 'RECORD' }
 
-  HASH.each_key do |method|
-    define_method method do
-      begin
-        @tiv.cmd("IRCODE #{HASH[method]}")
-      rescue
-        @tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-        @tiv.cmd("IRCODE #{HASH[method]}")
-      end
-    end
-  end
+	def keypress key
+		begin
+			@tiv.cmd("IRCODE #{HASH[key]}")
+		rescue
+      @tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+			@tiv.cmd("IRCODE #{HASH[key]}")
+		end
+	end
   extend self
 end
 # Yamaha RX-V473, probably works with several models
@@ -43,16 +39,14 @@ module Yamaha
   @yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
   
   HASH = { 'k' => 'VOL=Up 5 dB', 'j' => 'VOL=Down 5 dB','p' => "PWR=On", 'P' => "PWR=Off", 'h' => "INP=HDMI1", 'l' => "INP=HDMI2" }
-  HASH.each_key do |method|
-    define_method method do
-      begin
-        @yam.cmd("@MAIN:#{HASH[method]}")
-      rescue
-        @yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-        @yam.cmd("@MAIN:#{HASH[method]}")
-      end
-    end
-    end
+	def keypress key
+		begin
+			@yam.cmd("@MAIN:#{HASH[key]}")
+		rescue
+			@yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+			@yam.cmd("@MAIN:#{HASH[key]}")
+		end
+	end
   extend self
 end
 
@@ -97,11 +91,7 @@ until @status == 'q'
     puts "Key : Command"
     Object.const_get(@mode)::HASH.each { |key,value| puts " #{key}  : #{value}" }
   else
-    if Object.const_get(@mode).respond_to?(str)
-      Object.const_get(@mode).send(str)
-    else
-      puts "Not a valid command, press 'H' for help"
-    end
+		Object.const_get(@mode).keypress(str)
   end
 end
 end
