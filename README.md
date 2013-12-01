@@ -8,8 +8,10 @@
   - Alfred 2 workflow, I'v never used it but from what I've seen it looks perfect for this 
   - fix some code smells
   - add ability to type in unmapped commands
+
 ## Usage
+
 ````ruby remote.rb````
-press 'm' to select a control mode
-press 'H' for help for that mode's commands
-'q' to quit
+press ```m``` to select a control mode
+press ```H``` for help for that mode's commands
+```q``` to quit
