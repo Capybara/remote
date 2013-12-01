@@ -5,7 +5,7 @@
 require 'net/telnet'
 require 'open-uri'
 # Plex Home Theatre, I think this uses a new port now. Plex-Ruby gem wouldn't work for me
-module Plex
+class Plex
   CMDS = { 'k' => 'moveUp', 'j' => 'moveDown', 'h' => 'moveLeft', 'l' => 'moveRight', 'K' => 'pageUp', 'J' => 'pageDown', ' ' => 'select', 'b' => 'back', 't' => 'toggleOSD' }
   def keypress key
     begin
@@ -14,47 +14,49 @@ module Plex
       puts "can't connect to Plex" #would like something more helpful
     end
 	end
-  extend self
 end
+
 # Tivo Series 3
-module Tivo
-  @tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-  
-# other commands that can be added: UP DOWN LEFT RIGHT SELECT TIVO LIVETV THUMBSUP THUMBSDOWN CHANNELUP CHANNELDOWN RECORD DISPLAY DIRECTV NUM0 NUM1 NUM2 NUM3 NUM4 NUM5 NUM6 NUM7 NUM8 NUM9 ENTER CLEAR PLAY PAUSE SLOW FORWARD REVERSE STANDBY NOWSHOWING REPLAY ADVANCE DELIMITER GUIDE
-
-  CMDS = { 'j' => 'CHANNELDOWN', 'k' => 'CHANNELUP', 'J' => 'DOWN', 'K' => 'UP','l' => 'RIGHT', 'h' => 'LEFT', 'g' => 'GUIDE', ' ' => 'SELECT', 'T' => 'THUMBSUP', 't' => 'THUMBSDOWN', 'r' => 'RECORD' }
-
-	def keypress key
+class Tivo
+	CMDS = { 'j' => 'CHANNELDOWN', 'k' => 'CHANNELUP', 'J' => 'DOWN', 'K' => 'UP','l' => 'RIGHT', 'h' => 'LEFT', 'g' => 'GUIDE', ' ' => 'SELECT', 'T' => 'THUMBSUP', 't' => 'THUMBSDOWN', 'r' => 'RECORD' }
+  def initialize 
+		host="10.0.1.5"
+		port=31339
+		@tiv = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+  end
+  def keypress key
 		begin
 			@tiv.cmd("IRCODE #{CMDS[key]}")
+			@tiv.close
 		rescue
-      @tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+			@tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
 			@tiv.cmd("IRCODE #{CMDS[key]}")
+			@tiv.close
 		end
-	end
-  extend self
+  end
 end
+
 # Yamaha RX-V473, probably works with several models
-module Yamaha
-  @yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-  
+class Yamaha
   CMDS = { 'k' => 'VOL=Up 5 dB', 'j' => 'VOL=Down 5 dB','p' => "PWR=On", 'P' => "PWR=Off", 'h' => "INP=HDMI1", 'l' => "INP=HDMI2" }
-	def keypress key
+  def initialize host="10.0.1.9", port=50000
+    @yam = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+  end
+  def keypress key
 		begin
 			@yam.cmd("@MAIN:#{CMDS[key]}")
+			@yam.close
 		rescue
-			@yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+			@yam = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
 			@yam.cmd("@MAIN:#{CMDS[key]}")
+			@yam.close
 		end
-	end
-  extend self
+  end
 end
 
-class Remote
-include Tivo
-include Yamaha
+#class Remote
 @status = 'go'
-@mode = 'Tivo'
+@mode = Tivo
 until @status == 'q'
   begin
     system("stty raw -echo")
@@ -91,8 +93,6 @@ until @status == 'q'
     puts "Key : Command"
     @mode::CMDS.each { |key,value| puts " #{key}  : #{value}" }
   else
-		@mode.keypress(str)
+		@mode.new.keypress(str)
   end
 end
-end
-Remote.new
