@@ -1,3 +1,7 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+# Written by: j on 11-30-2013 
+# ruby 2.0.0p247
 require 'net/telnet'
 module Tivo
 		@tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
@@ -13,8 +17,22 @@ module Tivo
 		end
 		extend self
 end
+
+module Yamaha
+		@yam = Net::Telnet::new('Host' => '10.0.1.9', 'Port' => 50000, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+		
+		HASH = { 'k' => 'VOL=Up 5 dB', 'j' => 'VOL=Down 5 dB','p' => "PWR=On", 'P' => "PWR=Off", 'h' => "INP=HDMI1", 'l' => "INP=HDMI2" }
+		HASH.each_key do |method|
+			define_method method do
+				@yam.cmd("@MAIN:#{HASH[method]}")
+			end
+		end
+		extend self
+end
+
 class Remote
 include Tivo
+include Yamaha
 @status = 'go'
 @mode = 'Tivo'
 until @status == 'q'
@@ -27,6 +45,14 @@ until @status == 'q'
 		system("stty -raw echo")
 	end
 	case str.chr
+	when 'm'
+		if @mode == 'Tivo'
+			@mode = 'Yamaha'
+		elsif 
+			@mode == 'Yamaha'
+			@mode = 'Tivo'
+		end
+		p @mode
 	when 'k'
 		if @mode == 'Tivo'
 			Tivo.send('channelup')
@@ -34,6 +60,8 @@ until @status == 'q'
 	when 'j'
 		if @mode == 'Tivo'
 			Tivo.send('channeldown')
+		elsif @mode == 'Yamaha'
+			Yamaha.send('j')
 		end
 	when 'K'
 		if @mode == 'Tivo'
