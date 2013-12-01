@@ -79,8 +79,10 @@ until @status == 'q'
     case inp.chr
     when 'p'
       @mode = Plex
+			Yamaha.new.keypress('h')
     when 't'
       @mode = Tivo
+			Yamaha.new.keypress('l')
     when 'y'
       @mode = Yamaha
     end
