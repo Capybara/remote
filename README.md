@@ -11,7 +11,7 @@
 
 ## Usage
 
-````ruby remote.rb````
-press ```m``` to select a control mode
-press ```H``` for help for that mode's commands
-```q``` to quit
+  - ````ruby remote.rb````
+  - press ```m``` to select a control mode
+  - press ```H``` for help for that mode's commands
+  - ```q``` to quit
