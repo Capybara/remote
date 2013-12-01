@@ -3,6 +3,21 @@
 # Written by: j on 11-30-2013 
 # ruby 2.0.0p247
 require 'net/telnet'
+require 'open-uri'
+module Plex
+	  HASH = { 'k' => 'moveUp', 'j' => 'moveDown', 'h' => 'moveLeft', 'l' => 'moveRight', 'K' => 'pageUp', 'J' => 'pageDown', ' ' => 'select', 'b' => 'back', 't' => 'toggleOSD' }
+		HASH.each_key do |method|
+			define_method method do
+				begin
+					open("http://10.0.1.23:32400/system/players/10.0.1.23/navigation/#{HASH[method]}")
+				rescue
+					puts "can't connect to Plex"
+				end
+			end
+		end
+		extend self
+end
+
 module Tivo
 		@tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
 		
@@ -54,11 +69,23 @@ until @status == 'q'
 	end
 	case str.chr
 	when 'm'
-		if @mode == 'Tivo'
-			@mode = 'Yamaha'
-		elsif 
-			@mode == 'Yamaha'
+    puts "Enter control mode: "
+		puts " p : Plex"
+		puts " t : Tivo"
+		puts " y : Yamaha"
+		begin
+			system("stty raw -echo")
+			inp = STDIN.getc
+		ensure
+			system("stty -raw echo")
+		end
+		case inp.chr
+		when 'p'
+			@mode = 'Plex'
+		when 't'
 			@mode = 'Tivo'
+		when 'y'
+			@mode = 'Yamaha'
 		end
 		system('clear')
 		p @mode
