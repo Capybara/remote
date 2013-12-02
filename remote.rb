@@ -13,26 +13,26 @@ class Plex
     rescue
       puts "can't connect to Plex" #would like something more helpful
     end
-	end
+  end
 end
 
 # Tivo Series 3
 class Tivo
-	CMDS = { 'j' => 'CHANNELDOWN', 'k' => 'CHANNELUP', 'J' => 'DOWN', 'K' => 'UP','l' => 'RIGHT', 'h' => 'LEFT', 'g' => 'GUIDE', ' ' => 'SELECT', 'T' => 'THUMBSUP', 't' => 'THUMBSDOWN', 'r' => 'RECORD' }
+  CMDS = { 'j' => 'CHANNELDOWN', 'k' => 'CHANNELUP', 'J' => 'DOWN', 'K' => 'UP','l' => 'RIGHT', 'h' => 'LEFT', 'g' => 'GUIDE', ' ' => 'SELECT', 'T' => 'THUMBSUP', 't' => 'THUMBSDOWN', 'r' => 'RECORD' }
   def initialize 
-		host="10.0.1.5"
-		port=31339
-		@tiv = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+    host="10.0.1.5"
+    port=31339
+    @tiv = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
   end
   def keypress key
-		begin
-			@tiv.cmd("IRCODE #{CMDS[key]}")
-			@tiv.close
-		rescue
-			@tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-			@tiv.cmd("IRCODE #{CMDS[key]}")
-			@tiv.close
-		end
+    begin
+      @tiv.cmd("IRCODE #{CMDS[key]}")
+      @tiv.close
+    rescue
+      @tiv = Net::Telnet::new('Host' => '10.0.1.5', 'Port' => 31339, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+      @tiv.cmd("IRCODE #{CMDS[key]}")
+      @tiv.close
+    end
   end
 end
 
@@ -43,14 +43,14 @@ class Yamaha
     @yam = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
   end
   def keypress key
-		begin
-			@yam.cmd("@MAIN:#{CMDS[key]}")
-			@yam.close
-		rescue
-			@yam = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-			@yam.cmd("@MAIN:#{CMDS[key]}")
-			@yam.close
-		end
+    begin
+      @yam.cmd("@MAIN:#{CMDS[key]}")
+      @yam.close
+    rescue
+      @yam = Net::Telnet::new('Host' => host, 'Port' => port, 'Wait-time' => 0.1, 'Prompt' => /.*/, 'Telnet-mode' => false)
+      @yam.cmd("@MAIN:#{CMDS[key]}")
+      @yam.close
+    end
   end
 end
 
@@ -79,10 +79,10 @@ until @status == 'q'
     case inp.chr
     when 'p'
       @mode = Plex
-			Yamaha.new.keypress('h')
+      Yamaha.new.keypress('h')
     when 't'
       @mode = Tivo
-			Yamaha.new.keypress('l')
+      Yamaha.new.keypress('l')
     when 'y'
       @mode = Yamaha
     end
@@ -95,6 +95,6 @@ until @status == 'q'
     puts "Key : Command"
     @mode::CMDS.each { |key,value| puts " #{key}  : #{value}" }
   else
-		@mode.new.keypress(str)
+    @mode.new.keypress(str)
   end
 end
