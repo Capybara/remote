@@ -1,0 +1,2 @@
+    play = %w[ play stop rewind fastForward stepForward bigStepForward stepBack bigStepBack skipNext skipPrevious pause ]
+    navigation = %w[ moveUp moveDown moveLeft moveRight pageUp pageDown nextLetter previousLetter select back contextMenu toggleOSD ]
