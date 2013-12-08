@@ -7,6 +7,7 @@ require_relative 'plex'
 require_relative 'yamaha'
 include Commandable
 
+system('clear')
 @status = 'go'
 @mode = Tivo
 until @status == 'q'
