@@ -5,51 +5,46 @@
 require_relative 'tivo'
 require_relative 'plex'
 require_relative 'yamaha'
-
+include Pressable
+def mode
+  puts "Enter control mode: "
+  puts " p : Plex"
+  puts " t : Tivo"
+  puts " y : Yamaha"
+  case inp = get_press
+  when 'p'
+    @mode = Plex
+    Yamaha.new.keypress('h')
+  when 't'
+    @mode = Tivo
+    Yamaha.new.keypress('l')
+  when 'y'
+    @mode = Yamaha
+  end
+  system('clear')
+  p @mode
+end
+def help_me
+  puts "#{@mode} commands"
+  puts "Key : Command"
+  puts " H  : help"
+  puts " q  : quit"
+  @mode.new.cmds.each { |key,value| puts " #{key}  : #{value}" }
+end
+#---------------------------------------------------------------------------
 @status = 'go'
 @mode = Tivo
 until @status == 'q'
-  begin
-    system("stty raw -echo")
-    str = STDIN.getc
-  ensure
-    system("stty -raw echo")
-  end
-  case str.chr
+  case @key = get_press
   when 'm'
-    puts "Enter control mode: "
-    puts " p : Plex"
-    puts " t : Tivo"
-    puts " y : Yamaha"
-    begin
-      system("stty raw -echo")
-      inp = STDIN.getc
-    ensure
-      system("stty -raw echo")
-    end
-    case inp.chr
-    when 'p'
-      @mode = Plex
-      Yamaha.new.keypress('h')
-    when 't'
-      @mode = Tivo
-      Yamaha.new.keypress('l')
-    when 'y'
-      @mode = Yamaha
-    end
-    system('clear')
-    p @mode
+    mode
   when 'i'
     @mode.new.insert_c
   when 'q'
     @status = 'q'
   when 'H'
-    puts "#{@mode} commands"
-    puts "Key : Command"
-    puts " H  : help"
-    puts " q  : quit"
-    @mode.new.cmds.each { |key,value| puts " #{key}  : #{value}" }
+    help_me
   else
-    @mode.new.keypress(str)
+    @mode.new.keypress(@key)
   end
 end
