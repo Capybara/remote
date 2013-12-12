@@ -16,6 +16,8 @@ until @status == 'q'
     mode
   when 'i'
     @mode.new.insert_c
+  when 'c'
+    @mode.new.channel
   when 'q'
     @status = 'q'
   when 'H'

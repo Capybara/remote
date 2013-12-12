@@ -11,4 +11,8 @@ class Tivo
   def ins
     #
   end
+  def channel(ch=gets.chomp)
+      send_command "FORCECH #{ch}"
+      system('clear')
+  end
 end

@@ -26,11 +26,18 @@ module Commandable
     end
   end
 
-  def keypress key
+  def send_command command
     begin
         con = Net::Telnet::new('Host' => @host, 'Port' => @port, 'Wait-time' => 1, 'Prompt' => /.*/, 'Telnet-mode' => false)
-        con.cmd("#{@prefix + @cmds[key]}")
+        con.cmd("#{command}")
         con.close
+    rescue
+      puts "#{command} is not a valid command, press 'H' for help"
+    end
+  end
+  def keypress key
+    begin
+      send_command "#{@prefix + @cmds[key]}"
     rescue
       puts "#{key} is not a valid command, press 'H' for help"
     end
