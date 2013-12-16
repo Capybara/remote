@@ -43,29 +43,3 @@ module Commandable
     end
   end
 end
-
-def mode
-  puts "Enter control mode: "
-  puts " p : Plex"
-  puts " t : Tivo"
-  puts " y : Yamaha"
-  case inp = get_press
-  when 'p'
-    @mode = Plex
-    Yamaha.new.keypress('h')
-  when 't'
-    @mode = Tivo
-    Yamaha.new.keypress('l')
-  when 'y'
-    @mode = Yamaha
-  end
-  system('clear')
-  p @mode
-end
-def help_me
-  puts "#{@mode} commands"
-  puts "Key : Command"
-  puts " H  : help"
-  puts " q  : quit"
-  @mode.new.cmds.each { |key,value| puts " #{key}  : #{value}" }
-end
